@@ -12,6 +12,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// Render on every request instead of prerendering at build time, so new rows in
+// Supabase show up without a redeploy. Also forces supabase-js's fetch to
+// `no-store`, which would otherwise cache the query response.
+export const dynamic = "force-dynamic";
+
 type CaptionWithImage = {
   id: string;
   text: string;
