@@ -52,8 +52,8 @@ export default async function Home() {
 
   if (error) {
     return (
-      <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-12">
-        <p className="rounded-lg border border-red-500/30 bg-red-500/5 p-4 text-sm text-red-600 dark:text-red-400">
+      <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-16">
+        <p className="card border-red-500/30 bg-red-500/5 p-4 text-sm text-red-600 dark:text-red-400">
           Could not load captions: {error.message}
         </p>
       </main>
@@ -61,45 +61,70 @@ export default async function Home() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-12">
-      <h1 className="text-2xl font-semibold tracking-tight">Meme List</h1>
+    <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-12 sm:py-16">
+      <header className="max-w-xl">
+        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+          Meme List
+        </h1>
+        <p className="mt-3 text-[15px] leading-relaxed text-muted">
+          A small gallery of memes and their captions, served from Supabase
+          Storage.
+        </p>
+      </header>
 
       {captions.length === 0 ? (
-        <p className="mt-8 rounded-xl border border-dashed border-black/15 p-8 text-center text-sm opacity-60 dark:border-white/20">
+        <p className="mt-12 rounded-2xl border border-dashed border-line p-12 text-center text-sm text-muted">
           No captions yet.
         </p>
       ) : (
-        <ul className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {captions.map((caption) => {
-            const image = caption.images;
-            return (
-              <li
-                key={caption.id}
-                className="flex flex-col overflow-hidden rounded-xl border border-black/10 dark:border-white/15"
-              >
-                {image && image.width && image.height && (
-                  // Fixed-ratio box so the three cards in a row line up. Memes
-                  // vary from 465×372 to 1237×1454, so `contain` keeps the whole
-                  // image visible rather than cropping the joke out of frame.
-                  <div className="relative aspect-square w-full bg-black/[0.03] dark:bg-white/[0.04]">
-                    <Image
-                      src={imageSrc(image.storage_path)}
-                      alt={caption.text}
-                      width={image.width}
-                      height={image.height}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
-                )}
+        <>
+          <p className="mt-10 text-xs font-medium uppercase tracking-wider text-muted">
+            {captions.length} {captions.length === 1 ? "meme" : "memes"}
+          </p>
 
-                <div className="p-4">
-                  <p className="text-[15px] leading-relaxed">{caption.text}</p>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+          <ul className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {captions.map((caption) => {
+              const image = caption.images;
+              return (
+                <li
+                  key={caption.id}
+                  className="card group flex flex-col overflow-hidden transition-shadow hover:shadow-md"
+                >
+                  {image && image.width && image.height && (
+                    // Fixed-ratio box so the three cards in a row line up. Memes
+                    // vary from 465×372 to 1237×1454, so `contain` keeps the whole
+                    // image visible rather than cropping the joke out of frame.
+                    <div className="relative aspect-square w-full overflow-hidden border-b border-line bg-foreground/[0.03]">
+                      <Image
+                        src={imageSrc(image.storage_path)}
+                        alt={caption.text}
+                        width={image.width}
+                        height={image.height}
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
+                        className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex flex-1 flex-col justify-between gap-3 p-5">
+                    <p className="text-[15px] leading-relaxed">
+                      {caption.text}
+                    </p>
+                    <time
+                      dateTime={caption.created_at}
+                      className="text-xs text-muted"
+                    >
+                      {new Date(caption.created_at).toLocaleDateString(
+                        "en-US",
+                        { month: "short", day: "numeric", year: "numeric" },
+                      )}
+                    </time>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </>
       )}
     </main>
   );
