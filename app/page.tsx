@@ -1,16 +1,6 @@
 import Image from "next/image";
-import { createClient } from "@supabase/supabase-js";
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local",
-  );
-}
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { createClient } from "@/lib/supabase/server";
+import SignInPrompt from "./components/SignInPrompt";
 
 // Render on every request instead of prerendering at build time, so new rows in
 // Supabase show up without a redeploy. Also forces supabase-js's fetch to
@@ -33,15 +23,24 @@ type CaptionWithImage = {
   } | null;
 };
 
-// storage_path is the key inside the public `images` bucket (e.g.
-// "seed/foo.png"), so it resolves to a public Storage URL. The bucket's public
-// path is allow-listed in `images.remotePatterns` in next.config.ts.
-function imageSrc(storagePath: string) {
-  return supabase.storage.from("images").getPublicUrl(storagePath).data
-    .publicUrl;
-}
-
 export default async function Home() {
+  const supabase = await createClient();
+
+  // The gallery is members-only, so signed-out visitors get the sign-in card as
+  // the landing page instead — no captions are fetched for them at all.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return (
+      <SignInPrompt
+        title="Sign in to see the memes"
+        subtitle="The gallery is for members only. Continue with Google to start browsing."
+      />
+    );
+  }
+
   const { data: captions, error } = await supabase
     .from("captions")
     .select(
@@ -59,6 +58,12 @@ export default async function Home() {
       </main>
     );
   }
+
+  // storage_path is the key inside the public `images` bucket (e.g.
+  // "seed/foo.png"), so it resolves to a public Storage URL. The bucket's public
+  // path is allow-listed in `images.remotePatterns` in next.config.ts.
+  const imageSrc = (storagePath: string) =>
+    supabase.storage.from("images").getPublicUrl(storagePath).data.publicUrl;
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-12 sm:py-16">

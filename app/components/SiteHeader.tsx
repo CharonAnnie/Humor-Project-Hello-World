@@ -36,7 +36,7 @@ export default async function SiteHeader() {
                 href="/dashboard"
                 className="hidden rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:text-foreground sm:block"
               >
-                Dashboard
+                Members
               </Link>
               <Link
                 href="/profile"

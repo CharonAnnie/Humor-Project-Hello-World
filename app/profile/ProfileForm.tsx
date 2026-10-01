@@ -181,7 +181,7 @@ export default function ProfileForm({
           >
             {busy ? "Saving…" : "Save changes"}
           </button>
-          <Link href="/dashboard" className="btn btn-secondary">
+          <Link href="/" className="btn btn-secondary">
             Done
           </Link>
         </div>

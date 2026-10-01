@@ -28,7 +28,7 @@ export async function GET(request: Request) {
   }
 
   // First-time users have no names yet, so send them to fill those in before
-  // they reach the gated page.
+  // they reach the gallery.
   const { data: profile } = await supabase
     .from("profiles")
     .select("first_name, last_name")
@@ -37,7 +37,5 @@ export async function GET(request: Request) {
 
   const needsNames = !profile?.first_name || !profile?.last_name;
 
-  return NextResponse.redirect(
-    `${origin}${needsNames ? "/onboarding" : "/dashboard"}`,
-  );
+  return NextResponse.redirect(`${origin}${needsNames ? "/onboarding" : "/"}`);
 }

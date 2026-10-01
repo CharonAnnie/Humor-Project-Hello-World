@@ -18,7 +18,7 @@ export default async function OnboardingPage() {
     .single();
 
   // Nothing to collect, so don't make returning users fill the form again.
-  if (profile?.first_name && profile?.last_name) redirect("/dashboard");
+  if (profile?.first_name && profile?.last_name) redirect("/");
 
   async function saveNames(formData: FormData) {
     "use server";
@@ -46,7 +46,7 @@ export default async function OnboardingPage() {
 
     if (error) redirect("/onboarding?error=save_failed");
 
-    redirect("/dashboard");
+    redirect("/");
   }
 
   return (
