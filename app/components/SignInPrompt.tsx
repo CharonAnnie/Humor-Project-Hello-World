@@ -8,11 +8,15 @@ import { createClient } from "@/lib/supabase/client";
 export default function SignInPrompt({
   title = "Welcome back",
   subtitle = "Sign in to edit your profile and see the members-only page.",
+  notice = null,
 }: {
   title?: string;
   subtitle?: string;
+  // A failure carried in the URL by `/auth/callback` or the provider. Shown
+  // until the next attempt replaces it with that attempt's own error.
+  notice?: string | null;
 }) {
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(notice);
   const [busy, setBusy] = useState(false);
 
   const signInWithGoogle = async () => {

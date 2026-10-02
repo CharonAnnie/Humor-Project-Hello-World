@@ -1,5 +1,7 @@
 import Image from "next/image";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { firstParam, signInNotice } from "@/lib/auth-notice";
 import SignInPrompt from "./components/SignInPrompt";
 
 // Render on every request instead of prerendering at build time, so new rows in
@@ -23,7 +25,7 @@ type CaptionWithImage = {
   } | null;
 };
 
-export default async function Home() {
+export default async function Home({ searchParams }: PageProps<"/">) {
   const supabase = await createClient();
 
   // The gallery is members-only, so signed-out visitors get the sign-in card as
@@ -33,10 +35,21 @@ export default async function Home() {
   } = await supabase.auth.getUser();
 
   if (!user) {
+    const params = await searchParams;
+
+    // Supabase only redirects to `redirectTo` when that exact URL is in the
+    // project's Redirect URLs allow-list; otherwise it falls back to the Site
+    // URL, which lands the OAuth code here instead of on /auth/callback. Hand it
+    // to the callback rather than showing a sign-in card to someone who is
+    // holding a valid code.
+    const code = firstParam(params.code);
+    if (code) redirect(`/auth/callback?code=${encodeURIComponent(code)}`);
+
     return (
       <SignInPrompt
         title="Sign in to see the memes"
         subtitle="The gallery is for members only. Continue with Google to start browsing."
+        notice={signInNotice(params.error, params.error_description)}
       />
     );
   }

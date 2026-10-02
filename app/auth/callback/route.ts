@@ -8,6 +8,17 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
 
+  // Google/Supabase report a declined or failed consent as `?error=` instead of
+  // sending a code, so pass that through rather than blaming a missing code.
+  const providerError = searchParams.get("error");
+
+  if (providerError) {
+    const query = new URLSearchParams({ error: providerError });
+    const description = searchParams.get("error_description");
+    if (description) query.set("error_description", description);
+    return NextResponse.redirect(`${origin}/login?${query}`);
+  }
+
   if (!code) {
     return NextResponse.redirect(`${origin}/login?error=missing_code`);
   }
