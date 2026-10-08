@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { firstParam, signInNotice } from "@/lib/auth-notice";
 import SignInPrompt from "@/app/components/SignInPrompt";
 
-// Signed-in visitors have nothing to do here, so send them to the memes.
+// Signed-in visitors have nothing to do here, so send them to the gallery.
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const supabase = await createClient();
   const {

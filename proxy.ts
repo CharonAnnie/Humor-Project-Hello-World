@@ -13,7 +13,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 // Signed-in users only. This is an optimistic check that keeps anonymous
 // visitors out early; each page under these paths re-checks the session
 // server-side, because proxy runs before any authorization data is trusted.
-const PROTECTED = ["/dashboard", "/profile", "/onboarding"];
+const PROTECTED = ["/dashboard", "/profile", "/onboarding", "/create"];
 
 // Next.js 16 renamed Middleware to Proxy, so this file is `proxy.ts` and the
 // export is `proxy` — a `middleware.ts` here would simply never run.

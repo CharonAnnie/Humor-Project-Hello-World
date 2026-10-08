@@ -2,9 +2,10 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import Avatar from "./Avatar";
 import SignOutButton from "./SignOutButton";
+import StreakBadge from "./StreakBadge";
 
 // One header for every route, so the app reads as a single product instead of
-// five separate pages. Rendered on the server, which avoids a signed-out flash.
+// seven separate pages. Rendered on the server, which avoids a signed-out flash.
 export default async function SiteHeader() {
   const supabase = await createClient();
   const {
@@ -14,7 +15,7 @@ export default async function SiteHeader() {
   const { data: profile } = user
     ? await supabase
         .from("profiles")
-        .select("first_name, last_name, avatar_url")
+        .select("first_name, last_name, avatar_url, current_streak, last_vote_date")
         .eq("id", user.id)
         .single()
     : { data: null };
@@ -26,18 +27,34 @@ export default async function SiteHeader() {
           href="/"
           className="text-[15px] font-semibold tracking-tight hover:opacity-70"
         >
-          Meme List
+          Caption Drop
         </Link>
 
         <nav className="flex items-center gap-1 sm:gap-2">
+          <Link
+            href="/leaderboard"
+            className="hidden rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:text-foreground sm:block"
+          >
+            Leaderboard
+          </Link>
+
           {user ? (
             <>
               <Link
-                href="/dashboard"
+                href="/create"
                 className="hidden rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:text-foreground sm:block"
               >
-                Members
+                Drop a photo
               </Link>
+
+              {/* The streak is the reason to come back, so it lives in the
+                  chrome rather than buried on the dashboard. */}
+              <StreakBadge
+                currentStreak={profile?.current_streak ?? 0}
+                lastVoteDate={profile?.last_vote_date ?? null}
+                className="hidden md:inline-flex"
+              />
+
               <Link
                 href="/profile"
                 className="flex items-center gap-2 rounded-full p-1 pr-3 text-sm transition-colors hover:bg-foreground/5"

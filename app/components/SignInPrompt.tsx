@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 // signed-out visitors, so there is exactly one copy of the OAuth call.
 export default function SignInPrompt({
   title = "Welcome back",
-  subtitle = "Sign in to edit your profile and see the members-only page.",
+  subtitle = "Sign in to generate captions and vote on everyone else's.",
   notice = null,
 }: {
   title?: string;

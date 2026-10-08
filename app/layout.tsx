@@ -14,8 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Meme List",
-  description: "A list of memes and their captions.",
+  title: "Caption Drop",
+  description:
+    "Upload any photo, get AI captions in three voices, and vote on the one that lands.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
