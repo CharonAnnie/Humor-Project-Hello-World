@@ -31,15 +31,17 @@ export default async function SiteHeader() {
         </Link>
 
         <nav className="flex items-center gap-1 sm:gap-2">
-          <Link
-            href="/leaderboard"
-            className="hidden rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:text-foreground sm:block"
-          >
-            Leaderboard
-          </Link>
-
           {user ? (
             <>
+              {/* Members-only, so guests aren't offered a link that would just
+                  bounce them to /login. */}
+              <Link
+                href="/leaderboard"
+                className="hidden rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:text-foreground sm:block"
+              >
+                Leaderboard
+              </Link>
+
               <Link
                 href="/create"
                 className="hidden rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:text-foreground sm:block"

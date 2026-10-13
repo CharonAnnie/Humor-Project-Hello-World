@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import DeleteCaptionButton from "@/app/components/DeleteCaptionButton";
 import StreakBadge from "@/app/components/StreakBadge";
 
 // Vote totals and streaks change constantly, so this is never prerendered.
@@ -133,6 +134,17 @@ export default async function DashboardPage() {
                     {caption.upvotes}/{caption.downvotes}
                   </span>
                 </span>
+
+                {/* Every row here is the viewer's own caption, so the control
+                    needs no ownership check of its own. */}
+                <DeleteCaptionButton
+                  captionId={caption.id}
+                  describedAs={
+                    caption.voices?.label
+                      ? `your ${caption.voices.label} caption`
+                      : "your caption"
+                  }
+                />
               </li>
             ))}
           </ul>

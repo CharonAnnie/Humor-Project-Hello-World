@@ -284,6 +284,42 @@ body {
   background: color-mix(in srgb, #f59e0b 10%, var(--surface));
 }
 
+/* Segmented control, used for the leaderboard's today / all-time toggle. */
+.toggle-group {
+  display: inline-flex;
+  padding: 0.1875rem;
+  gap: 0.1875rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.toggle-option {
+  padding: 0.3125rem 0.875rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--muted);
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.toggle-option:hover:not([data-active]) {
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+}
+
+.toggle-option[data-active] {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.toggle-option:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
 /* Rank number on the leaderboard. */
 .rank-pill {
   display: inline-flex;
@@ -302,6 +338,21 @@ body {
 .rank-pill[data-top="true"] {
   background: var(--accent);
   color: var(--accent-foreground);
+}
+
+/* Step number in the "how it works" list on the landing page. */
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--foreground) 6%, var(--surface));
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
 }
 
 /* Shown while a photo uploads and Gemini writes. */

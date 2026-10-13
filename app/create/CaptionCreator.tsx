@@ -6,7 +6,7 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { Voice } from "@/lib/prompts";
 import { generateCaptionsForUpload, type GeneratedRow } from "./actions";
-import { deleteCaption } from "@/app/actions/captions";
+import DeleteCaptionButton from "@/app/components/DeleteCaptionButton";
 
 // Downscaling before upload keeps the Storage object small, the upload quick and
 // the image token count (and so the latency) down. 1600px is still more detail
@@ -95,9 +95,6 @@ export default function CaptionCreator({
   const [note, setNote] = useState("");
   const [preview, setPreview] = useState<string | null>(null);
   const [prepared, setPrepared] = useState<Prepared | null>(null);
-  // Caption id waiting for a second click, and the one currently being deleted.
-  const [armed, setArmed] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [captions, setCaptions] = useState<GeneratedRow[]>([]);
 
@@ -106,8 +103,6 @@ export default function CaptionCreator({
     setPreview(null);
     setPrepared(null);
     setFileName(null);
-    setArmed(null);
-    setDeleting(null);
     setCaptions([]);
     setError(null);
     setNote("");
@@ -200,30 +195,6 @@ export default function CaptionCreator({
     } finally {
       setStep("");
     }
-  };
-
-  // Deleting is irreversible, so the first click arms the button and the second
-  // confirms. Cheaper than a modal and it still prevents a misclick binning a
-  // caption the user liked.
-  const onDelete = async (id: string) => {
-    if (armed !== id) {
-      setArmed(id);
-      return;
-    }
-
-    setArmed(null);
-    setDeleting(id);
-    setError(null);
-
-    const result = await deleteCaption(id);
-    setDeleting(null);
-
-    if (!result.ok) {
-      setError(result.message);
-      return;
-    }
-
-    setCaptions((current) => current.filter((caption) => caption.id !== id));
   };
 
   const busy = phase === "working";
@@ -342,7 +313,8 @@ export default function CaptionCreator({
             <>
               <p className="text-xs leading-relaxed text-muted">
                 These are live in the gallery now. Delete any that didn&apos;t
-                land and nobody will get to vote on them.
+                land and nobody will get to vote on them — you can still bin one
+                later from the gallery or your dashboard.
               </p>
 
               <ul className="flex flex-col gap-3">
@@ -354,29 +326,18 @@ export default function CaptionCreator({
                     <div className="flex items-start justify-between gap-3">
                       <span className="voice-chip">{caption.voiceLabel}</span>
 
-                      <button
-                        type="button"
-                        onClick={() => onDelete(caption.id)}
-                        onBlur={() =>
-                          setArmed((current) =>
-                            current === caption.id ? null : current,
+                      {/* This list is local state, not a server render, so the
+                          row is dropped here rather than by revalidation. */}
+                      <DeleteCaptionButton
+                        captionId={caption.id}
+                        describedAs={`the ${caption.voiceLabel} caption`}
+                        onDeleted={(id) =>
+                          setCaptions((current) =>
+                            current.filter((item) => item.id !== id),
                           )
                         }
-                        disabled={deleting === caption.id}
-                        className="caption-delete"
-                        data-armed={armed === caption.id || undefined}
-                        aria-label={
-                          armed === caption.id
-                            ? `Confirm deleting the ${caption.voiceLabel} caption`
-                            : `Delete the ${caption.voiceLabel} caption`
-                        }
-                      >
-                        {deleting === caption.id
-                          ? "Deleting…"
-                          : armed === caption.id
-                            ? "Really delete?"
-                            : "Delete"}
-                      </button>
+                        onError={setError}
+                      />
                     </div>
 
                     <p className="mt-2 text-[15px] leading-relaxed">
